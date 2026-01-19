@@ -1,23 +1,26 @@
-export function generateSummary(asin, rows, type) {
+export function generatePPTText(asin, rows, type) {
   const total = rows.reduce((s, r) => s + r.daily, 0)
   const sum = f =>
     rows.filter(r => r.funnel === f).reduce((s, r) => s + r.daily, 0)
 
-  let text = `ASIN：${asin}\n`
+  const pct = f => Math.round((sum(f) / total) * 100)
+
+  let text = `DSP 投放策略说明（ASIN：${asin}）\n\n`
+  text += `【投放目标】\n提升整体 ROAS，放大中后端转化效率。\n\n`
+  text += `【策略结构】\n`
 
   if (type === 'P+') {
-    text +=
-      `本次 DSP 投放采用 P+ 策略结构，聚焦中后端转化效率。\n` +
-      `通过 Amazon AI 模型进行拉新与再营销并行投放。\n`
+    text += `采用 P+ 人群策略，AI 拉新与再营销并行。\n`
   } else {
-    text += `本次 DSP 投放采用常规漏斗策略结构。\n`
     if (sum('Awareness') > 0)
-      text += `- Awareness 占比 ${Math.round(sum('Awareness') / total * 100)}%\n`
+      text += `- Awareness（${pct('Awareness')}%）：前端拉新\n`
     text +=
-      `- Consideration 占比 ${Math.round(sum('Consideration') / total * 100)}%\n` +
-      `- Conversion 占比 ${Math.round(sum('Conversion') / total * 100)}%\n`
+      `- Consideration（${pct('Consideration')}%）：核心投放\n` +
+      `- Conversion（${pct('Conversion')}%）：转化承接\n`
   }
 
-  text += `整体策略以 ROAS 为核心优化目标。`
+  text += `\n【优化逻辑】\n人群分层 + 预算倾斜，提升整体投放效率。`
   return text
 }
+
+
